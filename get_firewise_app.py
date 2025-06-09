@@ -3,7 +3,7 @@ import streamlit as st
 import pandas as pd
 from datetime import date
 
-st.set_page_config(page_title="Get Firewise School Engagement Tracker", layout="wide")
+st.set_page_config(page_title="Get Firewise School Engagement Tracker Hadlee is awesome", layout="wide")
 
 st.title("🔥 Get Firewise - School Engagement Tracker Hadlee is awesome!")
 
