@@ -5,7 +5,7 @@ from datetime import date
 
 st.set_page_config(page_title="Get Firewise School Engagement Tracker", layout="wide")
 
-st.title("🔥 Get Firewise - School Engagement Tracker")
+st.title("🔥 Get Firewise - School Engagement Tracker Hadlee is awesome!")
 
 # Initialize session state for school data
 if "school_data" not in st.session_state:
