@@ -1,14 +1,16 @@
+
 import streamlit as st
 import pandas as pd
 from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
 
-# Dummy data
+# Dummy data for Pipeline deals
 pipeline_data = pd.DataFrame([
     {"Owner": "Alice", "Contacts": "Greenwood High", "Stage": "Qualified", "Close Probability": "60%", "Estimated Deal": "$12,000"},
     {"Owner": "Bob", "Contacts": "Maple Leaf Academy", "Stage": "Proposal", "Close Probability": "75%", "Estimated Deal": "$18,500"},
     {"Owner": "Charlie", "Contacts": "Riverdale School", "Stage": "Negotiation", "Close Probability": "85%", "Estimated Deal": "$25,000"}
 ])
 
+# Dummy data for Closed Won deals
 closed_won_data = pd.DataFrame([
     {"Owner": "Diana", "Contacts": "Sunrise Elementary", "Stage": "Closed Won", "Close Probability": "100%", "Estimated Deal": "$30,000"},
     {"Owner": "Ethan", "Contacts": "Hilltop School", "Stage": "Closed Won", "Close Probability": "100%", "Estimated Deal": "$22,000"}
