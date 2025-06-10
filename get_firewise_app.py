@@ -5,43 +5,132 @@ import pandas as pd
 st.set_page_config(layout="wide")
 st.title("School Engagement Dashboard")
 
-# Define unique dummy data for each stage
-agreed_schools = pd.DataFrame([
-    {"School Name": "Greenwood High", "Contact": "Alice Johnson (alice@greenwood.edu)", "Website": '<a href="https://greenwood.edu" target="_blank">Visit Site</a>', "Stage": "Agreed"},
-    {"School Name": "Maple Leaf Academy", "Contact": "Brian Smith (brian@mapleleaf.edu)", "Website": '<a href="https://mapleleaf.edu" target="_blank">Visit Site</a>', "Stage": "Agreed"}
-])
+# Initialize session state for school data
+if 'school_data' not in st.session_state:
+    st.session_state.school_data = pd.DataFrame([
+        {
+            "School Name": "Greenwood High",
+            "Firewise Teacher": "Alice Johnson",
+            "Email": "alice@greenwood.edu",
+            "Phone": "123-456-7890",
+            "Website": "https://greenwood.edu",
+            "Stage": "Agreed"
+        },
+        {
+            "School Name": "Maple Leaf Academy",
+            "Firewise Teacher": "Brian Smith",
+            "Email": "brian@mapleleaf.edu",
+            "Phone": "234-567-8901",
+            "Website": "https://mapleleaf.edu",
+            "Stage": "Agreed"
+        },
+        {
+            "School Name": "Riverdale School",
+            "Firewise Teacher": "Catherine Lee",
+            "Email": "catherine@riverdale.edu",
+            "Phone": "345-678-9012",
+            "Website": "https://riverdale.edu",
+            "Stage": "Completing"
+        },
+        {
+            "School Name": "Sunrise Elementary",
+            "Firewise Teacher": "David Kim",
+            "Email": "david@sunrise.edu",
+            "Phone": "456-789-0123",
+            "Website": "https://sunrise.edu",
+            "Stage": "Completing"
+        },
+        {
+            "School Name": "Hilltop School",
+            "Firewise Teacher": "Emma Brown",
+            "Email": "emma@hilltop.edu",
+            "Phone": "567-890-1234",
+            "Website": "https://hilltop.edu",
+            "Stage": "Firefighter Visit"
+        },
+        {
+            "School Name": "Lakeside Academy",
+            "Firewise Teacher": "Frank Green",
+            "Email": "frank@lakeside.edu",
+            "Phone": "678-901-2345",
+            "Website": "https://lakeside.edu",
+            "Stage": "Firefighter Visit"
+        }
+    ])
 
-completing_schools = pd.DataFrame([
-    {"School Name": "Riverdale School", "Contact": "Catherine Lee (catherine@riverdale.edu)", "Website": '<a href="https://riverdale.edu" target="_blank">Visit Site</a>', "Stage": "Completing"},
-    {"School Name": "Sunrise Elementary", "Contact": "David Kim (david@sunrise.edu)", "Website": '<a href="https://sunrise.edu" target="_blank">Visit Site</a>', "Stage": "Completing"}
-])
+if 'edit_index' not in st.session_state:
+    st.session_state.edit_index = None
 
-firefighter_schools = pd.DataFrame([
-    {"School Name": "Hilltop School", "Contact": "Emma Brown (emma@hilltop.edu)", "Website": '<a href="https://hilltop.edu" target="_blank">Visit Site</a>', "Stage": "Firefighter Visit"},
-    {"School Name": "Lakeside Academy", "Contact": "Frank Green (frank@lakeside.edu)", "Website": '<a href="https://lakeside.edu" target="_blank">Visit Site</a>', "Stage": "Firefighter Visit"}
-])
+# Add or edit school form
+def add_or_edit_school_form():
+    is_editing = st.session_state.edit_index is not None
+    st.subheader("Edit School" if is_editing else "Add New School")
 
-# Combine all for overview
-overview_schools = pd.concat([agreed_schools, completing_schools, firefighter_schools], ignore_index=True)
+    if is_editing:
+        school = st.session_state.school_data.iloc[st.session_state.edit_index]
+    else:
+        school = {}
 
-# Tab names
+    with st.form("school_form"):
+        name = st.text_input("School Name", value=school.get("School Name", ""))
+        teacher = st.text_input("Firewise Teacher Name", value=school.get("Firewise Teacher", ""))
+        email = st.text_input("Email", value=school.get("Email", ""))
+        phone = st.text_input("Phone Number", value=school.get("Phone", ""))
+        website = st.text_input("Website", value=school.get("Website", ""))
+        stage = st.selectbox("Stage", ["Agreed", "Completing", "Firefighter Visit"],
+                             index=["Agreed", "Completing", "Firefighter Visit"].index(school.get("Stage", "Agreed")))
+
+        submitted = st.form_submit_button("Update" if is_editing else "Add")
+
+        if submitted:
+            new_entry = {
+                "School Name": name,
+                "Firewise Teacher": teacher,
+                "Email": email,
+                "Phone": phone,
+                "Website": website,
+                "Stage": stage
+            }
+            if is_editing:
+                st.session_state.school_data.iloc[st.session_state.edit_index] = new_entry
+                st.success("School updated successfully!")
+                st.session_state.edit_index = None
+            else:
+                st.session_state.school_data = pd.concat([
+                    st.session_state.school_data,
+                    pd.DataFrame([new_entry])
+                ], ignore_index=True)
+                st.success("School added successfully!")
+
+# Display table with edit buttons
+def display_table(df, stage_name):
+    st.subheader(f"{stage_name} Schools")
+    search = st.text_input(f"Search {stage_name}", key=f"search_{stage_name}")
+    filtered_df = df.copy()
+    if search:
+        filtered_df = df[df.apply(lambda row: search.lower() in row["School Name"].lower() or search.lower() in row["Firewise Teacher"].lower(), axis=1)]
+
+    for i, row in filtered_df.iterrows():
+        cols = st.columns([3, 3, 3, 3, 3, 2, 1])
+        cols[0].markdown(f"**{row['School Name']}**")
+        cols[1].write(row["Firewise Teacher"])
+        cols[2].write(row["Email"])
+        cols[3].write(row["Phone"])
+        cols[4].markdown(f"Visit Site")
+        cols[5].write(row["Stage"])
+        if cols[6].button("✏️", key=f"edit_{i}"):
+            st.session_state.edit_index = i
+            st.experimental_rerun()
+
+# Tabs
 tab_names = ["Overview", "Agreed", "Completing", "Firefighter Visit"]
 tabs = st.tabs(tab_names)
 
-# Display searchable tables in each tab
 for i, tab in enumerate(tabs):
     with tab:
         if tab_names[i] == "Overview":
-            df = overview_schools.copy()
-        elif tab_names[i] == "Agreed":
-            df = agreed_schools.copy()
-        elif tab_names[i] == "Completing":
-            df = completing_schools.copy()
-        elif tab_names[i] == "Firefighter Visit":
-            df = firefighter_schools.copy()
-
-        st.subheader(f"{tab_names[i]} Schools")
-        search = st.text_input("Search by school name or contact", key=f"search_{i}")
-        if search:
-            df = df[df.apply(lambda row: search.lower() in row["School Name"].lower() or search.lower() in row["Contact"].lower(), axis=1)]
-        st.write(df.to_html(escape=False, index=False), unsafe_allow_html=True)
+            add_or_edit_school_form()
+            display_table(st.session_state.school_data, "Overview")
+        else:
+            stage_df = st.session_state.school_data[st.session_state.school_data["Stage"] == tab_names[i]]
+            display_table(stage_df, tab_names[i])
