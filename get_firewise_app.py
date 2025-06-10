@@ -35,4 +35,13 @@ for i, tab in enumerate(tabs):
             df = overview_schools.copy()
         elif tab_names[i] == "Agreed":
             df = agreed_schools.copy()
-        elif tab_names[i] == "Comple
+        elif tab_names[i] == "Completing":
+            df = completing_schools.copy()
+        elif tab_names[i] == "Firefighter Visit":
+            df = firefighter_schools.copy()
+
+        st.subheader(f"{tab_names[i]} Schools")
+        search = st.text_input("Search by school name or contact", key=f"search_{i}")
+        if search:
+            df = df[df.apply(lambda row: search.lower() in row["School Name"].lower() or search.lower() in row["Contact"].lower(), axis=1)]
+        st.write(df.to_html(escape=False, index=False), unsafe_allow_html=True)
