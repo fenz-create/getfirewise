@@ -1,37 +1,24 @@
 import streamlit as st
-import pandas as pd
 
-# Define stages and their corresponding progress values
-stages = {
-    "Not Started": 0,
-    "Signed Up": 25,
-    "Agreed": 50,
-    "Completing": 75,
-    "Completed": 100
-}
+st.title("School Progress Tracker")
 
-# Initialize session state for schools
-if 'schools' not in st.session_state:
-    st.session_state.schools = pd.DataFrame({
-        'School Name': [f"School {i+1}" for i in range(45)],
-        'Stage': ["Not Started"] * 45
-    })
+schools = [f"School {i+1}" for i in range(45)]
+stages = ["Not Started", "In Progress", "Completed"]
+selected_stages = {}
 
-st.title("🔥 Get Firewise Programme - School Progress Tracker")
+st.sidebar.header("Overall Progress")
 
-# Display the table with dropdowns and progress bars
-for i in range(len(st.session_state.schools)):
-    cols = st.columns([2, 2, 6])
-    with cols[0]:
-        st.markdown(f"**{st.session_state.schools.at[i, 'School Name']}**")
-    with cols[1]:
-        selected_stage = st.selectbox(
-            label="",
-            options=list(stages.keys()),
-            index=list(stages.keys()).index(st.session_state.schools.at[i, 'Stage']),
-            key=f"stage_{i}"
-        )
-        st.session_state.schools.at[i, 'Stage'] = selected_stage
-    with cols[2]:
-        progress = stages[selected_stage] / 100
-        st.progress(progress)
+completed_count = 0
+for school in schools:
+    col1, col2 = st.columns([2, 3])
+    with col1:
+        st.write(school)
+    with col2:
+        stage = st.selectbox(f"Stage for {school}", stages, key=school)
+        selected_stages[school] = stage
+        if stage == "Completed":
+            completed_count += 1
+
+progress = completed_count / len(schools)
+st.sidebar.progress(progress)
+st.sidebar.write(f"{completed_count} out of {len(schools)} schools completed ({progress*100:.1f}%)")
