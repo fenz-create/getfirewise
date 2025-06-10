@@ -132,14 +132,14 @@ def add_or_edit_school_form():
                 st.success("School added successfully!")
             st.session_state.edit_index = None
             st.session_state.show_form = False
-            st.experimental_rerun()
+            st.rerun()
 
         if cancel:
             st.session_state.edit_index = None
             st.session_state.show_form = False
-            st.experimental_rerun()
+            st.rerun()
 
-# Display table with edit buttons
+# Display table with headers and alternating row colors
 def display_table(df, stage_name):
     st.subheader(f"{stage_name} Schools")
     search = st.text_input(f"Search {stage_name}", key=f"search_{stage_name}")
@@ -150,19 +150,28 @@ def display_table(df, stage_name):
             axis=1
         )]
 
-    for i in filtered_df.index:
+    # Header row
+    header_cols = st.columns([3, 3, 3, 3, 3, 2, 1])
+    headers = ["School Name", "Firewise Teacher", "Email", "Phone", "Website", "Stage", ""]
+    for col, header in zip(header_cols, headers):
+        col.markdown(f"**{header}**")
+
+    # Data rows
+    for idx, i in enumerate(filtered_df.index):
         row = filtered_df.loc[i]
-        cols = st.columns([3, 3, 3, 3, 3, 2, 1])
-        cols[0].markdown(f"**{row['School Name']}**")
-        cols[1].write(row["Firewise Teacher"])
-        cols[2].write(row["Email"])
-        cols[3].markdown(f"[{row['Phone']}](tel:{row['Phone']})")  # tel: link
-        cols[4].markdown(f"Visit Site")
-        cols[5].write(row["Stage"])
-        if cols[6].button("✏️", key=f"edit_{uuid.uuid4()}"):
+        row_cols = st.columns([3, 3, 3, 3, 3, 2, 1])
+        bg_color = "#f9f9f9" if idx % 2 == 0 else "#ffffff"
+
+        row_cols[0].markdown(f"<div style='background-color:{bg_color}; padding:4px'><strong>{row['School Name']}</strong></div>", unsafe_allow_html=True)
+        row_cols[1].markdown(f"<div style='background-color:{bg_color}; padding:4px'>{row['Firewise Teacher']}</div>", unsafe_allow_html=True)
+        row_cols[2].markdown(f"<div style='background-color:{bg_color}; padding:4px'>{row['Email']}</div>", unsafe_allow_html=True)
+        row_cols[3].markdown(f"<div style='background-color:{bg_color}; padding:4px'>[{row['Phone']}](tel:{row['Phone']})</div>", unsafe_allow_html=True)
+        row_cols[4].markdown(f"<div style='background-color:{bg_color}; padding:4px'>[Visit Site]({v>", unsafe_allow_html=True)
+        row_cols[5].markdown(f"<div style='background-color:{bg_color}; padding:4px'>{row['Stage']}</div>", unsafe_allow_html=True)
+        if row_cols[6].button("✏️", key=f"edit_{uuid.uuid4()}"):
             st.session_state.edit_index = i
             st.session_state.show_form = True
-            st.experimental_rerun()
+            st.rerun()
 
 # Tabs
 tab_names = ["Overview", "Agreed", "Completing", "Firefighter Visit"]
