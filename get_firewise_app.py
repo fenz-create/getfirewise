@@ -111,3 +111,30 @@ def display_table(df, stage_name):
         filtered_df = df[df.apply(
             lambda row: search.lower() in row["School Name"].lower() or search.lower() in row["Firewise Teacher"].lower(),
             axis=1
+        )]
+
+    for i in filtered_df.index:
+        row = filtered_df.loc[i]
+        cols = st.columns([3, 3, 3, 3, 3, 2, 1])
+        cols[0].markdown(f"**{row['School Name']}**")
+        cols[1].write(row["Firewise Teacher"])
+        cols[2].write(row["Email"])
+        cols[3].write(row["Phone"])
+        cols[4].markdown(f"[Visit Site]
+        cols[5].write(row["Stage"])
+        if cols[6].button("✏️", key=f"edit_{i}_{row['School Name']}"):
+            st.session_state.edit_index = i
+            st.experimental_rerun()
+
+# Tabs
+tab_names = ["Overview", "Agreed", "Completing", "Firefighter Visit"]
+tabs = st.tabs(tab_names)
+
+for i, tab in enumerate(tabs):
+    with tab:
+        if tab_names[i] == "Overview":
+            add_or_edit_school_form()
+            display_table(st.session_state.school_data, "Overview")
+        else:
+            stage_df = st.session_state.school_data[st.session_state.school_data["Stage"] == tab_names[i]]
+            display_table(stage_df, tab_names[i])
