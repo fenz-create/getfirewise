@@ -1,79 +1,74 @@
-
 import streamlit as st
-import pandas as pd
-from datetime import date
-
-st.set_page_config(page_title="Get Firewise School Engagement Tracker", layout="wide")
-
-st.title("🔥 Get Firewise - School Engagement Tracker")
+import datetime
 
 # Initialize session state for school data
-if "school_data" not in st.session_state:
-    st.session_state.school_data = []
+if 'school_data' not in st.session_state:
+    st.session_state.school_data = {
+        'name': '',
+        'status': 'Not Signed Up',
+        'completion_date': None,
+        'visit_booked': False
+    }
 
-# Sidebar for admin view
-st.sidebar.header("Admin Dashboard")
-if st.sidebar.checkbox("Show Registered Schools"):
-    if st.session_state.school_data:
-        df = pd.DataFrame(st.session_state.school_data)
-        st.sidebar.dataframe(df)
-    else:
-        st.sidebar.info("No schools registered yet.")
+# Sidebar navigation
+page = st.sidebar.selectbox("Navigate", [
+    "Sign Up", 
+    "Agreement & Completion Date", 
+    "Completing Programme", 
+    "Book Firefighter Visit"
+])
 
-# School Registration Form
-st.header("🏫 School Sign-Up")
-with st.form("school_form"):
-    school_name = st.text_input("School Name")
-    contact_name = st.text_input("Contact Person")
-    email = st.text_input("Email Address")
-    region = st.selectbox("Region", ["North", "South", "East", "West", "Central"])
-    year_level = st.selectbox("Year Level", ["Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"])
-    agreed = st.checkbox("We agree to participate in the Get Firewise programme.")
-
-    submitted = st.form_submit_button("Register School")
-    if submitted:
-        if school_name and contact_name and email and agreed:
-            st.session_state.school_data.append({
-                "School": school_name,
-                "Contact": contact_name,
-                "Email": email,
-                "Region": region,
-                "Year Level": year_level,
-                "Agreed": "Yes" if agreed else "No",
-                "Completed": "No",
-                "Visit Booked": "No",
-                "Visit Date": ""
-            })
-            st.success(f"{school_name} has been registered successfully!")
+# Page 1: Sign Up
+if page == "Sign Up":
+    st.title("Get Firewise - School Sign Up")
+    school_name = st.text_input("Enter School Name")
+    if st.button("Sign Up"):
+        if school_name:
+            st.session_state.school_data['name'] = school_name
+            st.session_state.school_data['status'] = 'Signed Up'
+            st.success(f"{school_name} has signed up for the Get Firewise programme.")
         else:
-            st.error("Please complete all required fields and agree to participate.")
+            st.error("Please enter a school name.")
 
-# Programme Completion
-st.header("✅ Mark Programme Completion")
-school_list = [s["School"] for s in st.session_state.school_data]
-if school_list:
-    selected_school = st.selectbox("Select your school", school_list, key="completion_school")
-    if st.button("Mark as Completed"):
-        for s in st.session_state.school_data:
-            if s["School"] == selected_school:
-                s["Completed"] = "Yes"
-                st.success(f"{selected_school} marked as completed.")
-else:
-    st.info("No schools registered yet.")
+# Page 2: Agreement & Completion Date
+elif page == "Agreement & Completion Date":
+    st.title("Agreement Confirmation and Completion Date")
+    if st.session_state.school_data['status'] == 'Signed Up':
+        agreed = st.checkbox("School agrees to the programme")
+        completion_date = st.date_input("Set expected completion date", min_value=datetime.date.today())
+        if st.button("Confirm Agreement"):
+            if agreed:
+                st.session_state.school_data['status'] = 'Agreed'
+                st.session_state.school_data['completion_date'] = completion_date
+                st.success("Agreement confirmed and completion date set.")
+            else:
+                st.error("Please confirm agreement to proceed.")
+    else:
+        st.warning("School must sign up first.")
 
-# Firefighter Visit Booking
-st.header("🚒 Book a Firefighter Visit")
-if school_list:
-    selected_school = st.selectbox("Select your school", school_list, key="visit_school")
-    visit_date = st.date_input("Preferred Visit Date", min_value=date.today())
-    if st.button("Book Visit"):
-        for s in st.session_state.school_data:
-            if s["School"] == selected_school:
-                if s["Completed"] == "Yes":
-                    s["Visit Booked"] = "Yes"
-                    s["Visit Date"] = str(visit_date)
-                    st.success(f"Visit booked for {selected_school} on {visit_date}.")
-                else:
-                    st.warning("Please complete the programme before booking a visit.")
-else:
-    st.info("No schools registered yet.")
+# Page 3: Completing Programme
+elif page == "Completing Programme":
+    st.title("Update Status to Completing Programme")
+    if st.session_state.school_data['status'] == 'Agreed':
+        if st.button("Move to Completing Programme"):
+            st.session_state.school_data['status'] = 'Completing Programme'
+            st.success("School status updated to Completing Programme.")
+    else:
+        st.warning("School must agree to the programme first.")
+
+# Page 4: Book Firefighter Visit
+elif page == "Book Firefighter Visit":
+    st.title("Book a Firefighter Visit")
+    today = datetime.date.today()
+    if st.session_state.school_data['status'] == 'Completing Programme':
+        if st.session_state.school_data['completion_date'] and today >= st.session_state.school_data['completion_date']:
+            if not st.session_state.school_data['visit_booked']:
+                if st.button("Book Firefighter Visit"):
+                    st.session_state.school_data['visit_booked'] = True
+                    st.success("Firefighter visit booked successfully.")
+            else:
+                st.info("Firefighter visit already booked.")
+        else:
+            st.warning("Completion date not reached yet.")
+    else:
+        st.warning("School must be in Completing Programme status to book a visit.")
