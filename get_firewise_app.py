@@ -44,4 +44,5 @@ if st.session_state.page == 1:
     page_one()
 elif st.session_state.page == 2:
     page_two()
-elif st.session_state.page ==
+elif st.session_state.page == 3:
+    page_three()
