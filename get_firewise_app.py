@@ -123,7 +123,7 @@ def display_table(df, stage_name):
         cols[3].write(row["Phone"])
         cols[4].markdown(f"Visit Site")
         cols[5].write(row["Stage"])
-        if cols[6].button("✏️", key=f"edit_{i}_{row['School Name']}"):
+    if cols[6].button("✏️", key=f"edit_{i}_{uuid.uuid4()}"):
             st.session_state.edit_index = i
             st.experimental_rerun()
 
