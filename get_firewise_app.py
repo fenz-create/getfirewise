@@ -1,12 +1,19 @@
-import uuid
 import streamlit as st
 import pandas as pd
+import uuid
 
 # Set page layout
 st.set_page_config(layout="wide")
 st.title("School Engagement Dashboard")
 
-# Initialize session state for school data
+# Top-right add button
+top_cols = st.columns([10, 1])
+with top_cols[1]:
+    if st.button("➕", key="add_school"):
+        st.session_state.edit_index = None
+        st.session_state.show_form = True
+
+# Initialize session state
 if 'school_data' not in st.session_state:
     st.session_state.school_data = pd.DataFrame([
         {
@@ -62,8 +69,14 @@ if 'school_data' not in st.session_state:
 if 'edit_index' not in st.session_state:
     st.session_state.edit_index = None
 
+if 'show_form' not in st.session_state:
+    st.session_state.show_form = False
+
 # Add or edit school form
 def add_or_edit_school_form():
+    if not st.session_state.show_form and st.session_state.edit_index is None:
+        return
+
     is_editing = st.session_state.edit_index is not None
     st.subheader("Edit School" if is_editing else "Add New School")
 
@@ -82,60 +95,11 @@ def add_or_edit_school_form():
                              index=["Agreed", "Completing", "Firefighter Visit"].index(school.get("Stage", "Agreed")))
 
         submitted = st.form_submit_button("Update" if is_editing else "Add")
+        cancel = st.form_submit_button("Cancel")
 
         if submitted:
             new_entry = {
                 "School Name": name,
                 "Firewise Teacher": teacher,
                 "Email": email,
-                "Phone": phone,
-                "Website": website,
-                "Stage": stage
-            }
-            if is_editing:
-                st.session_state.school_data.loc[st.session_state.edit_index] = new_entry
-                st.success("School updated successfully!")
-                st.session_state.edit_index = None
-            else:
-                st.session_state.school_data = pd.concat([
-                    st.session_state.school_data,
-                    pd.DataFrame([new_entry])
-                ], ignore_index=True)
-                st.success("School added successfully!")
-
-# Display table with edit buttons
-def display_table(df, stage_name):
-    st.subheader(f"{stage_name} Schools")
-    search = st.text_input(f"Search {stage_name}", key=f"search_{stage_name}")
-    filtered_df = df.copy()
-    if search:
-        filtered_df = df[df.apply(
-            lambda row: search.lower() in row["School Name"].lower() or search.lower() in row["Firewise Teacher"].lower(),
-            axis=1
-        )]
-
-    for i in filtered_df.index:
-        row = filtered_df.loc[i]
-        cols = st.columns([3, 3, 3, 3, 3, 2, 1])
-        cols[0].markdown(f"**{row['School Name']}**")
-        cols[1].write(row["Firewise Teacher"])
-        cols[2].write(row["Email"])
-        cols[3].write(row["Phone"])
-        cols[4].markdown(f"Visit Site")
-        cols[5].write(row["Stage"])
-    if cols[6].button("✏️", key=f"edit_{i}_{uuid.uuid4()}"):
-            st.session_state.edit_index = i
-            st.experimental_rerun()
-
-# Tabs
-tab_names = ["Overview", "Agreed", "Completing", "Firefighter Visit"]
-tabs = st.tabs(tab_names)
-
-for i, tab in enumerate(tabs):
-    with tab:
-        if tab_names[i] == "Overview":
-            add_or_edit_school_form()
-            display_table(st.session_state.school_data, "Overview")
-        else:
-            stage_df = st.session_state.school_data[st.session_state.school_data["Stage"] == tab_names[i]]
-            display_table(stage_df, tab_names[i])
+                "Phone": phone
