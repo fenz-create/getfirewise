@@ -166,7 +166,7 @@ def display_table(df, stage_name):
         row_cols[1].markdown(f"<div style='background-color:{bg_color}; padding:4px'>{row['Firewise Teacher']}</div>", unsafe_allow_html=True)
         row_cols[2].markdown(f"<div style='background-color:{bg_color}; padding:4px'>{row['Email']}</div>", unsafe_allow_html=True)
         row_cols[3].markdown(f"<div style='background-color:{bg_color}; padding:4px'>[{row['Phone']}](tel:{row['Phone']})</div>", unsafe_allow_html=True)
-        row_cols[4].markdown(f"<div style='background-color:{bg_color}; padding:4px'>[Visit Site]({v>}, unsafe_allow_html=True)
+        row_cols[4].markdown(f"<div style='background-color:{bg_color}; padding:4px'>[Visit Site]}</div>", unsafe_allow_html=True)
         row_cols[5].markdown(f"<div style='background-color:{bg_color}; padding:4px'>{row['Stage']}</div>", unsafe_allow_html=True)
         if row_cols[6].button("✏️", key=f"edit_{uuid.uuid4()}"):
             st.session_state.edit_index = i
