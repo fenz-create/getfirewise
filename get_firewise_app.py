@@ -70,7 +70,7 @@ if 'last_notification' not in st.session_state:
     st.session_state.last_notification = time.time()
 
 # 🔔 In-app toast notification every 30 seconds
-if time.time() - st.session_state.last_notification > 30:
+if time.time() - st.session_state.last_notification > 3:
     st.toast("📣 Paihia School is finishing Get Firewise!")
     st.session_state.last_notification = time.time()
     st.rerun()
