@@ -1,82 +1,74 @@
 import streamlit as st
 import pandas as pd
 
-# Initialize session state for school data with dummy entries
-if 'school_data' not in st.session_state:
-    st.session_state.school_data = pd.DataFrame([
-        {
-            'School Name': 'Greenwood High',
-            'Programme Stage': 'Signed Up',
-            'Next Activity': 'Schedule onboarding call',
-            'Contact Person': 'Alice Johnson',
-            'Status': 'Active',
-            'Notes': 'Excited to start the program.'
-        },
-        {
-            'School Name': 'Maple Leaf Academy',
-            'Programme Stage': 'Onboarding',
-            'Next Activity': 'Send training materials',
-            'Contact Person': 'Brian Smith',
-            'Status': 'Pending',
-            'Notes': 'Waiting for confirmation on training date.'
-        },
-        {
-            'School Name': 'Riverdale School',
-            'Programme Stage': 'In Progress',
-            'Next Activity': 'Review mid-term report',
-            'Contact Person': 'Catherine Lee',
-            'Status': 'Active',
-            'Notes': 'Mid-term review scheduled for next week.'
-        },
-        {
-            'School Name': 'Sunrise Elementary',
-            'Programme Stage': 'Completed',
-            'Next Activity': 'Send completion certificate',
-            'Contact Person': 'David Kim',
-            'Status': 'Completed',
-            'Notes': 'Successfully completed the program.'
-        }
-    ])
+# Dummy data for Pipeline deals
+pipeline_data = pd.DataFrame([
+    {
+        "Owner": "Alice",
+        "Contacts": "Greenwood High",
+        "Stage": "Qualified",
+        "Close Probability": "60%",
+        "Estimated Deal": "$12,000"
+    },
+    {
+        "Owner": "Bob",
+        "Contacts": "Maple Leaf Academy",
+        "Stage": "Proposal",
+        "Close Probability": "75%",
+        "Estimated Deal": "$18,500"
+    },
+    {
+        "Owner": "Charlie",
+        "Contacts": "Riverdale School",
+        "Stage": "Negotiation",
+        "Close Probability": "85%",
+        "Estimated Deal": "$25,000"
+    }
+])
 
-# Sidebar navigation
-st.sidebar.title("Navigation")
-page = st.sidebar.radio("Go to", ["Dashboard", "Add/Edit School"])
+# Dummy data for Closed Won deals
+closed_won_data = pd.DataFrame([
+    {
+        "Owner": "Diana",
+        "Contacts": "Sunrise Elementary",
+        "Stage": "Closed Won",
+        "Close Probability": "100%",
+        "Estimated Deal": "$30,000"
+    },
+    {
+        "Owner": "Ethan",
+        "Contacts": "Hilltop School",
+        "Stage": "Closed Won",
+        "Close Probability": "100%",
+        "Estimated Deal": "$22,000"
+    }
+])
 
-# Dashboard page
-if page == "Dashboard":
-    st.title("School Programme Dashboard")
-    st.write("Manage client relationships and track school progress.")
+# Function to apply color-coded stage tags
+def color_stage(stage):
+    color_map = {
+        "Qualified": "blue",
+        "Proposal": "orange",
+        "Negotiation": "purple",
+        "Closed Won": "green"
+    }
+    color = color_map.get(stage, "gray")
+    return f"<span style='color:white; background-color:{color}; padding:4px; border-radius:4px'>{stage}</span>"
 
-    # Display the school data table
-    st.dataframe(st.session_state.school_data, use_container_width=True)
+# Apply color formatting to stage columns
+pipeline_data["Stage"] = pipeline_data["Stage"].apply(lambda x: color_stage(x))
+closed_won_data["Stage"] = closed_won_data["Stage"].apply(lambda x: color_stage(x))
 
-# Add/Edit School page
-elif page == "Add/Edit School":
-    st.title("Add or Edit School Entry")
+# Streamlit layout
+st.set_page_config(layout="wide")
+st.title("Client Relationship Dashboard")
 
-    with st.form("school_form"):
-        school_name = st.text_input("School Name")
-        programme_stage = st.selectbox("Programme Stage", [
-            "Signed Up", "Onboarding", "In Progress", "Completed"
-        ])
-        next_activity = st.text_input("Next Activity")
-        contact_person = st.text_input("Contact Person")
-        status = st.selectbox("Status", ["Active", "Pending", "Completed"])
-        notes = st.text_area("Notes")
+col1, col2 = st.columns(2)
 
-        submitted = st.form_submit_button("Submit")
+with col1:
+    st.subheader("📌 Pipeline")
+    st.write("Deals currently in progress.")
+    st.write(pipeline_data.to_html(escape=False, index=False), unsafe_allow_html=True)
 
-        if submitted:
-            new_entry = {
-                'School Name': school_name,
-                'Programme Stage': programme_stage,
-                'Next Activity': next_activity,
-                'Contact Person': contact_person,
-                'Status': status,
-                'Notes': notes
-            }
-            st.session_state.school_data = pd.concat([
-                st.session_state.school_data,
-                pd.DataFrame([new_entry])
-            ], ignore_index=True)
-            st.success("School entry added successfully!")
+with col2:
+    st.subheader("✅
