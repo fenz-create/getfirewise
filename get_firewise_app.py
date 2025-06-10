@@ -71,4 +71,6 @@ with col1:
     st.write(pipeline_data.to_html(escape=False, index=False), unsafe_allow_html=True)
 
 with col2:
-    st.subheader("✅
+    st.subheader("✅ Closed Won")
+    st.write("Successfully closed deals.")
+    st.write(closed_won_data.to_html(escape=False, index=False), unsafe_allow_html=True)
