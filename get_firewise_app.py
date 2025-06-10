@@ -6,13 +6,6 @@ import uuid
 st.set_page_config(layout="wide")
 st.title("School Engagement Dashboard")
 
-# Top-right add button
-top_cols = st.columns([10, 1])
-with top_cols[1]:
-    if st.button("➕", key="add_school"):
-        st.session_state.edit_index = None
-        st.session_state.show_form = True
-
 # Initialize session state
 if 'school_data' not in st.session_state:
     st.session_state.school_data = pd.DataFrame([
@@ -71,6 +64,18 @@ if 'edit_index' not in st.session_state:
 
 if 'show_form' not in st.session_state:
     st.session_state.show_form = False
+
+# Top-right toggle button
+top_cols = st.columns([10, 1])
+with top_cols[1]:
+    if st.session_state.show_form:
+        if st.button("➖", key="toggle_form"):
+            st.session_state.show_form = False
+            st.session_state.edit_index = None
+    else:
+        if st.button("➕", key="toggle_form"):
+            st.session_state.show_form = True
+            st.session_state.edit_index = None
 
 # Add or edit school form
 def add_or_edit_school_form():
