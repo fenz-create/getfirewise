@@ -146,7 +146,7 @@ def display_table(df, stage_name):
         cols[0].markdown(f"**{row['School Name']}**")
         cols[1].write(row["Firewise Teacher"])
         cols[2].write(row["Email"])
-        cols[3].write(row["Phone"])
+        cols[3].markdown(f"[{row['Phone']}](tel:{row['Phone']})")  # tel: link
         cols[4].markdown(f"Visit Site")
         cols[5].write(row["Stage"])
         if cols[6].button("✏️", key=f"edit_{uuid.uuid4()}"):
