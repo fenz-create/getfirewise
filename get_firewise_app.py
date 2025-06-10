@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import uuid
+import time
 
 # Set page layout
 st.set_page_config(layout="wide")
@@ -64,6 +65,15 @@ if 'edit_index' not in st.session_state:
 
 if 'show_form' not in st.session_state:
     st.session_state.show_form = False
+
+if 'last_notification' not in st.session_state:
+    st.session_state.last_notification = time.time()
+
+# 🔔 In-app toast notification every 30 seconds
+if time.time() - st.session_state.last_notification > 30:
+    st.toast("📣 Paihia School is finishing Get Firewise!")
+    st.session_state.last_notification = time.time()
+    st.experimental_rerun()
 
 # Top-right toggle button
 top_cols = st.columns([10, 1])
