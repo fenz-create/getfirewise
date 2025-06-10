@@ -73,6 +73,7 @@ if 'last_notification' not in st.session_state:
 if time.time() - st.session_state.last_notification > 3:
     st.toast("📣 Paihia School is finishing Get Firewise!")
     st.session_state.last_notification = time.time()
+time.sleep(2)  # Give time for the toast to display
     st.rerun()
 
 # Top-right toggle button
