@@ -137,4 +137,4 @@ for i, tab in enumerate(tabs):
             display_table(st.session_state.school_data, "Overview")
         else:
             stage_df = st.session_state.school_data[st.session_state.school_data["Stage"] == tab_names[i]]
-            display_table(stage_df, tab
+            display_table(stage_df, tab_names[i])
