@@ -120,7 +120,7 @@ def display_table(df, stage_name):
         cols[1].write(row["Firewise Teacher"])
         cols[2].write(row["Email"])
         cols[3].write(row["Phone"])
-        cols[4].markdown(f"[Visit Site]({row['Website']
+        cols[4].markdown(f"Visit Site")
         cols[5].write(row["Stage"])
         if cols[6].button("✏️", key=f"edit_{i}_{row['School Name']}"):
             st.session_state.edit_index = i
@@ -137,4 +137,4 @@ for i, tab in enumerate(tabs):
             display_table(st.session_state.school_data, "Overview")
         else:
             stage_df = st.session_state.school_data[st.session_state.school_data["Stage"] == tab_names[i]]
-            display_table(stage_df, tab_names[i])
+            display_table(stage_df, tab
