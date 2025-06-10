@@ -1,7 +1,7 @@
 
 import streamlit as st
 import pandas as pd
-from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode
+import AgGrid, GridOptionsBuilder, GridUpdateMode
 
 # Dummy data for Pipeline deals
 pipeline_data = pd.DataFrame([
