@@ -10,7 +10,7 @@ st.title("School Engagement Dashboard")
 
 # Initialize session state
 if 'school_data' not in st.session_state:
-    st.session_state.school_data = pd.DataFrame([
+    st.session_state.school_data = pd.DataFrame([)
         {
             "School Name": "Greenwood High",
             "Firewise Teacher": "Alice Johnson",
